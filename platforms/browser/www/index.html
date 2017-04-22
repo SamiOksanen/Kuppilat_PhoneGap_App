@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="format-detection" content="telephone=no" />
+    <meta name="msapplication-tap-highlight" content="no" />
+    <meta name="viewport" content="user-scalable=no, initial-scale=1, maximum-scale=1, minimum-scale=1, width=device-width" />
+    
+    
+	
+	<link rel="stylesheet"
+    href="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+
+	<script
+	src="https://code.jquery.com/jquery-2.1.4.js"
+	integrity="sha256-siFczlgw4jULnUICcdm9gjQPZkw/YPDqhQ9+nAOScE4="
+	crossorigin="anonymous"></script>
+    
+	<script 
+    src="http://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link href="https://fonts.googleapis.com/css?family=Yanone+Kaffeesatz" rel="stylesheet"> 
+    <link rel="stylesheet" href="css/themes/theme.css" />
+    <link rel="stylesheet" href="css/themes/jquery.mobile.icons.min.css" />
+    
+    <style type="text/css">
+        .virhe{
+            color: red;
+            font-size: 130%;}
+        input.kenttaVirhe{
+            border: 1px solid red;
+        }
+        #map{
+            height: 60%;
+        }
+    </style>
+    
+    <title>Kuppilat</title>
+</head>
+
+<body>	
+	<div data-role="popup" id="popupMenu" data-transition="pop" data-theme="a">
+		<a href="#" data-rel="back" class="ui-btn ui-btn-inline ui-corner-all ui-icon-delete ui-btn-icon-notext ui-btn-right">Sulje</a>
+
+		<ul data-role="listview">
+			<li><a href="#etusivu" class="ui-btn">Etusivu</a></li>
+			<li><a href="#loyda" class="ui-btn">Löydä</a></li>
+			<li><a href="#arvostele"  class="ui-btn">Arvostele</a></li>
+			<li><a href="#suositukset" class="ui-btn">Suositukset</a></li>
+			<li><a href="#asetukset" class="ui-btn">Asetukset</a></li>
+		</ul>
+	</div>
+	
+	<!-- Vain dynaamiset header ja footer ominaisuudella data-position="fixed" pysyvät paikallaan vilkkumatta, kun sivua vaihdetaan -->
+	<div data-role="header" data-theme="a" data-position="fixed">
+		<a href="#popupMenu" data-rel="popup" data-transition="flip" id="popupbtn" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
+		<h1></h1>
+		<div data-role="navbar" id="navi">
+			<ul>
+                <li><a href="#etusivu" class="ui-btn ui-icon-home ui-btn-icon-top ui-mini">Etusivu</a></li>
+			    <li><a href="#loyda" class="ui-btn ui-icon-search ui-btn-icon-top ui-mini">Löydä</a></li>
+			    <li><a href="#arvostele"  class="ui-btn ui-icon-edit ui-btn-icon-top ui-mini">Arvostele</a></li>
+			    <li><a href="#suositukset" class="ui-btn ui-icon-star ui-btn-icon-top ui-mini">Suositukset</a></li>
+			    <li><a href="#asetukset" class="ui-btn ui-icon-gear ui-btn-icon-top ui-mini">Asetukset</a></li>
+
+			</ul>
+		</div>
+	</div>
+	
+	<div data-role="footer" data-theme="b" data-position="fixed">
+		<h4>Copyright © 2017 by Sami Oksanen, ALL RIGHTS RESERVED</h4>
+	</div>
+	
+	<!-- <div data-role="panel" id="panelMenu" data-display="overlay" data-theme="a"> 
+		<ul data-role="listview">
+			<li><a href="#etusivu" class="ui-btn">Etusivu</a></li>
+			<li><a href="#loyda" class="ui-btn">Löydä</a></li>
+			<li><a href="#arvostele"  class="ui-btn">Arvostele</a></li>
+			<li><a href="#suositukset" class="ui-btn">Suositukset</a></li>
+			<li><a href="#asetukset" class="ui-btn">Asetukset</a></li>
+		</ul>
+	</div> -->
+		 
+	<div data-role="page" id="etusivu" data-title="Etusivu">
+	
+	    <div role="main" class="ui-content ui-body-a">
+            <p>Kuppilat on sovellus, jossa pystyt helposti löytämään parhaat lähimmät kahvilat ja baarit sekä arvostelemaan näitä paikkoja oman ja yhteisen hyvän vuoksi. Enää ei kenenkään tarvitse mennä kalliiseen räkälään viettämään iltaa taikka sitte hakemaan kahvia R-kioskilta.
+            <p>Etusivulla näkee kartan, joka paikantaa kohtaan jossa olet. Lisäksi kartalla näkyy lähellä olevia kahviloita. Kahvilan iconia painaessa tulee esiin pieni popup-ikkuna joka kertoo kahvilan nimen, osoitteen, mahd. nettisivun, sekä käyttäjien antaman yleisarvion kahvilasta. 
+            </p>
+            <div id="map"></div>
+	    </div> <!-- /content -->
+
+    </div> <!-- /page -->
+	
+	<div data-role="page" id="loyda" data-title="Löydä">
+  
+	    <div role="main" class="ui-content ui-body-a">
+			 <p>Löydä-sivulla voi hakea kahviloita nimen tai alueen perusteella hakusanoja käyttämällä. Haun päätteeksi tulee lista osumista. Osumaa painaessa saa auki alasivun jossa näkyy kahvilan nimi, osoite, mahd. nettisivu, käyttäjien antama yleisarvio, kartta joka näyttää kahvilan sijainti sekä liuta uusimpia käyttäjien antamia kommentteja.
+             </p>
+            <p id="loydaVastaus"></p>
+	    </div> <!-- /content -->
+		
+    </div> <!-- /page -->
+	
+	<div data-role="page" id="arvostele" data-title="Arvostele">
+  
+	    <div role="main" class="ui-content ui-body-a">
+            
+            <p>Arvostele-sivulla pystyy arvioimaan kahviloita joissa on käynyt. Arvostelut nimetään otsikolla, jonka jälkeen syötetään paikka joko nimen tai osoitteen avulla. Tämän jälkeen annetaan arvosana (0-5) ja annetaan yleiskommentti paikasta.
+            </p>
+	       <form action="#" method="post" id="lisaaMatkatapahtumaLomake">
+	            <div class="ui-field-contain">
+                    <label for="otsikko">Otsikko</label>
+                    <input type="text" id="otsikko" name="otsikko"> 
+               </div>
+			
+                <div class="ui-field-contain">
+                    <label for="paikka">Paikka</label>
+                    <input type="text" id="paikka" name="paikka">
+                </div>  
+                   
+                <div class="ui-field-contain">
+                    <label for="arvosana">Arvosana</label>
+                    <input type="text" id="arvosana" name="arvosana">
+                </div>  
+                  
+                <div class="ui-field-contain"> 
+                    <label for="kuvaus">Kuvaus</label>
+                    <textarea id="kuvaus" name="kuvaus"></textarea>
+                </div>               
+     
+                <button type="button" class="ui-btn ui-corner-all ui-btn-inline" id="lisaa" name="lisaa">Lisää</button>	
+				<a href="#" class="ui-btn ui-corner-all ui-btn-a ui-btn-icon-left ui-icon-delete ui-btn-inline" id="tyhjenna" name="tyhjenna">Tyhjennä</a>	
+			 </form>
+	    </div> <!-- /content -->
+
+    </div> <!-- /page -->
+	
+	<div data-role="page" id="suositukset" data-title="Suositukset">
+  
+	    <div role="main" class="ui-content ui-body-a">
+            
+            <p>Suositukset-sivulla löydät paikkoja joita sovellus suosittelee sinulle hakujesi, sijaintisi ja arvostelujesi perusteella.
+            </p>
+	
+	    </div> <!-- /content -->
+
+    </div> <!-- /page -->
+	
+	<div data-role="page" id="asetukset" data-title="Asetukset">
+  
+	    <div role="main" class="ui-content ui-body-a">
+            
+            <p>Asetukset-sivulla pystyy säätämään muun muassa omaa käyttäjänimeä ja sitä haluatko että sovellus näyttää vain baareja tai kahviloita tai molempia. Nämä tiedot tulevat tallentumaan paikallisesti puhelimeen.
+            <p>
+            
+            <label for="text-basic">Käyttäjänimi:</label>
+            <input type="text" name="text-basic" id="text-basic" value="nimetön">
+            <p>
+            
+            <fieldset data-role="controlgroup">
+                <legend>Mitä paikkoja haluat sovelluksen näyttävän: </legend>
+                <input type="checkbox" name="checkbox-1a" id="checkbox-1a" checked="">
+                <label for="checkbox-1a">näytä kahvilat</label>
+                <input type="checkbox" name="checkbox-2a" id="checkbox-2a" checked="">
+                <label for="checkbox-2a">näytä baarit</label>
+            </fieldset>
+
+	    </div> <!-- /content -->
+
+    </div> <!-- /page -->
+		
+
+    <script type="text/javascript" src="cordova.js"></script>
+    <script type="text/javascript" src="js/index.js"></script>
+    
+    <!-- Google Maps api, Maps JS API Key:  AIzaSyCHyMPOvX9U-KbReuuO6id-okGzF-1tnNE -->
+    <script 
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCHyMPOvX9U-KbReuuO6id-okGzF-1tnNE&libraries=places">
+    </script>
+    
+    <script type="text/javascript">
+
+		$(document).one("pagebeforecreate", function () {
+	
+			$( "[data-role='header']" ).toolbar().enhanceWithin(); 
+			$( "[data-role='footer']" ).toolbar(); 
+		
+			$("#popupMenu").popup().enhanceWithin(); 
+			$("#panelMenu").panel().enhanceWithin(); 			
+		})
+
+        $(document).on("pagecreate", "#etusivu", function () { 
+        })
+        
+        $( document ).on("pagecontainerchange", function() {
+			navi();
+		})
+        
+        $( document ).on( "pageinit", "#etusivu", function() {
+            var defaultLatLng = new google.maps.LatLng(60.192059, 24.945831);
+            if ( navigator.geolocation ) {
+                function success(pos) {
+                    // Location found, show map with these coordinates
+                    drawMap(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
+                }
+                function fail(error) {
+                    drawMap(defaultLatLng);  // Failed to find location, show default map
+                }
+                // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
+                navigator.geolocation.getCurrentPosition(success, fail, {maximumAge: 500000, enableHighAccuracy:true, timeout: 6000});
+            } else {
+                drawMap(defaultLatLng);  // No geolocation support, show default map
+            }
+            function drawMap(latlng) {
+                var myOptions = {
+                    zoom: 16,
+                    center: latlng
+                };
+                var map = new google.maps.Map(document.getElementById("map"), myOptions);
+                // Add an overlay to the map of current lat/lng
+                var marker = new google.maps.Marker({
+                    position: latlng,
+                    map: map,
+                    title: "Olet täällä!"
+                });
+            }
+        });
+        
+		$(document).on("pagecontainershow", function(event, data){
+            $(".ui-content").height(getRealContentHeight());
+            /* if(data.toPage[0].id == "etusivu"){
+                initMap();
+                
+            } */
+            if(data.toPage[0].id == "loyda"){
+                haeLahella();
+            }
+		})
+
+		$(window).on("resize orientationchange", function(){
+			$(".ui-content").height(getRealContentHeight());
+		})
+		
+		function getRealContentHeight() {
+			var activePage = $.mobile.pageContainer.pagecontainer("getActivePage"),
+				screen = $.mobile.getScreenHeight(),
+				header = $(".ui-header").hasClass("ui-header-fixed") ? $(".ui-header").outerHeight() - 1 : $(".ui-header").outerHeight(),
+				footer = $(".ui-footer").hasClass("ui-footer-fixed") ? $(".ui-footer").outerHeight() - 1 : $(".ui-footer").outerHeight(),
+				contentMargins = $(".ui-content", activePage).outerHeight() - $(".ui-content", activePage).height();
+			
+			var contentHeight = screen - header - footer - contentMargins;	
+			
+			return contentHeight;
+		}
+	
+		$(document).on("swipeleft", ".ui-page", function(event) { 
+	
+			if(event.handled !== true) { // Annetaan tapahtua vain kerran
+				var nextpage = $(this).next("div[data-role='page']");;
+				
+				if (nextpage.length == 0) {
+					nextpage = $("div[data-role='page']:first");
+				}
+		
+				$.mobile.pageContainer.pagecontainer ("change", nextpage);
+				event.handled = true;
+				navi();
+			}
+			return false;
+		})
+		
+		$(document).on("swiperight", ".ui-page", function(event) { 
+		
+			if(event.handled !== true) {
+				var prevpage = $(this).prev("div[data-role='page']");
+
+				if (prevpage.length == 0) {
+					prevpage = $("div[data-role='page']:last");
+				}
+				
+				$.mobile.pageContainer.pagecontainer ("change", prevpage);
+				event.handled = true;
+				navi();
+			}
+			return false;
+		})
+	
+
+		/* $(document).on("swiperight", ".ui-page", function(event) {
+			$( "#panelMenu" ).panel( "open" );
+		}) */
+
+		
+		function navi() {
+			// attribuutti data-title
+			var current = $( ".ui-page-active" ).jqmData( "title" );
+			
+			$( "[data-role='header'] h1" ).text( current );
+			
+			$( "[data-role='navbar'] a.ui-btn-active" ).removeClass( "ui-btn-active" );
+			
+			$( "[data-role='navbar'] a" ).each(function() {
+				if ( $( this ).text() === current ) {
+					$( this ).addClass( "ui-btn-active" );
+				}
+			})
+		}
+        
+       /* function initMap() {
+            var map = new google.maps.Map(document.getElementById('map'), {
+            center: {lat: 60.192059, lng: 24.945831},
+            zoom: 15
+            });
+            var infoWindow = new google.maps.InfoWindow({map: map});
+
+            // Try HTML5 geolocation.
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                var pos = {
+                    lat: position.coords.latitude,
+                    lng: position.coords.longitude
+                };
+
+                infoWindow.setPosition(pos);
+                infoWindow.setContent('Olet täällä!');
+                map.setCenter(pos);
+                }, function() {
+                    handleLocationError(true, infoWindow, map.getCenter());
+                });
+            } else {
+                // Browser doesn't support Geolocation
+                handleLocationError(false, infoWindow, map.getCenter());
+            }
+        }
+
+        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
+            infoWindow.setPosition(pos);
+            infoWindow.setContent(browserHasGeolocation ?
+                              'Error: The Geolocation service failed.' :
+                              'Error: Your browser doesn\'t support geolocation.');
+        } */
+        
+        function haeLahella() {  
+            var dataa = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=bars&location=60.192059,24.945831&radius=10&key=AIzaSyCHyMPOvX9U-KbReuuO6id-okGzF-1tnNE"
+			$.ajax({
+				url: dataa,
+				dataType: "json",
+  			})	
+			.done(function(data){
+                var lista = data.results;
+                var teksti = "";
+                $.each(lista, function(index, loydaVastaus){
+                    teksti += "<p>Name: " + loydaVastaus.name + "<br>Rating: " + loydaVastaus.rating + "</p>";
+                })
+                $("#loydaVastaus").html(teksti);
+			})
+			.fail(function() {
+			})	
+			.complete(function() {
+			})			
+		}
+	     
+    </script>
+    
+</body>
+
+</html>
