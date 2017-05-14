@@ -145,9 +145,9 @@
                 </div>
             </form>
             <div class="ui-field-contain">
+                    <h4 id="lisaysViesti"></h4>
                     <button id="lisaa" class="ui-btn ui-btn-inline ui-corner-all">Lisää arvostelu listaan</button>
             </div>
-            <h4 id="lisaysViesti"></h4>
             <ul data-role="listview" id="lista" data-inset="true">
             </ul>
 	    </div> <!-- /content -->
@@ -162,7 +162,6 @@
 			<h4 id="arvostelutViesti"></h4>
 			<p id="arvostelu">
 			</p>
-            <button id="tyhjenna" class="ui-btn ui-btn-inline ui-corner-all">Tyhjennä arvostelut</button>
 	
 	    </div> <!-- /content -->
 
@@ -187,6 +186,8 @@
 					<option value="1000">1 kilometri</option>
 					<option value="10000">10 kilometriä</option>
 				</select>
+                <h4 id="tallennusViesti"></h4>
+                <button id="tallenna" class="ui-btn ui-btn-inline ui-corner-all">Tallenna asetukset</button>
 
 	    </div> <!-- /content -->
 
@@ -376,7 +377,10 @@
                 loydaValmis();
             }
             if(data.toPage[0].id == "arvostelut"){
-                listaaArvostelut();
+                listaaArvostelutTietokannasta();
+            }
+            if(data.toPage[0].id == "asetukset"){
+                tallennaAsetukset();
             }
 		})
         
@@ -391,14 +395,42 @@
             });
             kameraValmis();
             
-            var storage = window.localStorage;
+            $("#lisaa").click(function(){
+                if($("#lisaaArvostelu").valid()){
+                    var jsonData = JSON.stringify({
+                        "paikka": $("#paikka").val(),
+                        "paiva": $("#paiva").val(), 
+                        "arvosana": $("#arvosana").val(),
+                        "kuvaus": $("#kuvaus").val()
+                    })	
+
+                    $.ajax({
+                        url: "http://proto353.haaga-helia.fi:8080/arvostelut/kaikki",
+                        type: "POST",
+                        data: jsonData,
+                        dataType: "json",
+                        contentType: "application/json; charset=utf-8"
+                    })
+                    .done(function(data) {
+                        $("#lisaysViesti").html("Lisätty ");
+                    })
+                    .fail(function() {
+                        $("#lisaysViesti").html("Lisäys ei onistunut");
+                    })	
+                    .complete(function() {
+                    })
+                }
+            })
+            
+            
+            /*var storage = window.localStorage;
             $("#lisaa").click(function() {
                 if($("#lisaaArvostelu").valid()){
                     var arvostelu = {paikka :  $("#paikka").val(), paiva : $("#paiva").val(), arvosana :  $("#arvosana").val(), kuva : fileURL, kuvaus : $("#kuvaus").val()};
                     storage.setItem(arvostelu.paikka, JSON.stringify(arvostelu));
                     $("#lisaysViesti").html("Lisätty");
                 }
-             });
+             });*/
             
             /* $("#lisaa").on("tap", function(){
                 var paikka = $("#paikka").val().trim();
@@ -421,8 +453,18 @@
             }) */
 		})
         
-
-		$(window).on("resize orientationchange", function(){
+        function tallennaAsetukset(){
+             var storage = window.localStorage;
+            $("#tallenna").click(function() {
+                
+                var asetukset = {id : 1, minimiArvosana :  $("#minimiArvosana").val(), etaisyys : $("#etaisyys").val()};
+                storage.setItem(asetukset.id, JSON.stringify(asetukset));
+                $("#tallennusViesti").html("Asetukset tallennettu");
+                
+             });
+        }
+        
+        $(window).on("resize orientationchange", function(){
 			$(".ui-content").height(getRealContentHeight());
 		})
 		
@@ -528,9 +570,20 @@
         function loydaValmis(){
             navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 40000 });
             var etaisyys = $("#etaisyys").val();
+            var minimiArvosana = $("#minimiArvosana").val();
+            
+            var storage = window.localStorage;
+            
+            var asetukset = storage.getItem(1);
+            if(storage.getItem(1) != null){
+                var item = JSON.parse(asetukset);
+                minimiArvosana = item.minimiArvosana;
+                etaisyys = item.etaisyys;
+            }
             console.log(etaisyys);
+            
 			function onLocationSuccess(position) {
-				haeLahella(position.coords.latitude, position.coords.longitude, etaisyys);
+				haeLahella(position.coords.latitude, position.coords.longitude, minimiArvosana, etaisyys);
 			}
 					
 			function onLocationError() {
@@ -538,7 +591,7 @@
 			}
         }
         
-        function haeLahella(lat, lng, etaisyys) {  
+        function haeLahella(lat, lng, minimiArvosana, etaisyys) {  
             var dataa = "https://maps.googleapis.com/maps/api/place/textsearch/json?query=bars&location=" + lat + "," + lng + "&radius=" + etaisyys + "&key=AIzaSyCHyMPOvX9U-KbReuuO6id-okGzF-1tnNE";
 			$.ajax({
 				url: dataa,
@@ -547,10 +600,10 @@
 			.done(function(data){
                 var lista = data.results;
                 var teksti = "";
-                var minimiArvosana = $("#minimiArvosana").val();
+                console.log(minimiArvosana);
                 $.each(lista, function(index, loydaVastaus){
-                    if(loydaVastaus.opening_hours && loydaVastaus.rating >= minimiArvosana){
-                        if(loydaVastaus.opening_hours.open_now == true){
+                    if(loydaVastaus.rating >= minimiArvosana){
+                        if(loydaVastaus.opening_hours && loydaVastaus.opening_hours.open_now == true){
                             teksti += "<p>" + loydaVastaus.name + "<br>Arvosana: " + loydaVastaus.rating + "<br>" + loydaVastaus.formatted_address + "<br>Avoinna nyt</p>"; 
                         }
                         else{
@@ -644,6 +697,7 @@
                     range: [0, 5]
 				},
 				kuvaus:  {
+                    required: true,
                     minlength: 10,
                     maxlength: 400,
 				},	
@@ -664,6 +718,7 @@
                     range: "Anna luku väliltä 0-5"
 				},
 				kuvaus: {
+                    required: "Anna kuvaus",
                     minlength: jQuery.validator.format("Vähintään {0} merkkiä"),
                     maxlength: jQuery.validator.format("Enintään {0} merkkiä"),
 				},
@@ -679,57 +734,36 @@
 			},
 		})
         
-        function lisaaArvosteluTietokantaan() {
-		
-			var jsonData = JSON.stringify({
-				"paikka": $("#paikka").val().trim(),
-				"paiva": $("#paiva").val().trim(), 
-				"arvosana": $("#arvosana").val().trim(),
-				"kuvaus": $("#kuvaus").val().trim(),
-			})	
-		
+        function listaaArvostelutTietokannasta() {
+            var minimiArvosana = $("#minimiArvosana").val();
+            var storage = window.localStorage;
+            var asetukset = storage.getItem(1);
+            if(storage.getItem(1) != null){
+                var item = JSON.parse(asetukset);
+                minimiArvosana = item.minimiArvosana;
+            }
+            var dataa = "http://proto353.haaga-helia.fi:8080/arvostelut/kaikki";
 			$.ajax({
-				url: "http://proto424.haaga-helia.fi/addMatkatapahtuma.php",
-                type: "POST",
-                data: jsonData,
-                dataType: "json",
-                contentType: "application/json; charset=utf-8"
-            })
-			.done(function(data) {
-				$("#lisaysViesti").html("Lisätty ");
-			})
-			.fail(function() {
-				$("#lisaysViesti").html("Lisäys ei onistunut");
-			})	
-			.complete(function() {
-			})
-		}
-        
-        function listaaArvostelutTietokannasta() {	
-			$("#arvostelut").html("").listview("refresh");
-			
-			$.ajax({
-				url: "http://proto424.haaga-helia.fi/getMatkatapahtuma.php",
+				url: dataa,
 				type: "GET",
                 dataType: "json",
                 contentType: "application/json; charset=utf-8",
 				cache: false
 			})
 			.done(function( data ) {		
-				var html = "";
+				var teksti = "";
 				var lkm = 0;
-				
 				$.each(data, function(index, arvostelu){
 					lkm++;
-					html = html + "<li><a href='#'>";
-					html += "<h4>" + arvostelu.paikka + "</h4>";
-					html += "<br>" + arvostelu.paiva;
-					html += "<br>" + arvostelu.arvosana;
-					html += "<br>" + arvostelu.kuvaus + "</p></a>";
-					html += "</a></li>";
-				})
+                    if(arvostelu.arvosana >= minimiArvosana){
+                        teksti += "<p><b>" + arvostelu.paikka + "</b>";
+                        teksti += "<br>" + arvostelu.paiva;
+                        teksti += "<br>Arvosana: " + arvostelu.arvosana;
+                        teksti += "<br>" + arvostelu.kuvaus;    
+                    } 
+                    })
 					
-				$("#arvostelut").html(html).listview("refresh");
+				$("#arvostelu").html(teksti);
 					
 				if (lkm != 0) {					
 					$("#arvosteluViesti").html("");
@@ -739,10 +773,10 @@
 				
 			})
 			.fail(function() {
-				$("#etusivuViesti").html("Arvosteluja ei pystytty hakemaan");
+				$("#arvosteluViesti").html("Arvosteluja ei pystytty hakemaan");
 			})			
 		}
-        function listaaArvostelut(){
+      /*  function listaaArvostelut(){
             var storage = window.localStorage;
 
             var teksti = "";
@@ -763,17 +797,11 @@
 
             $("#arvostelu").html(teksti);
             
-            /*$(document).on("tap", "#arvostelu li", function(){
-                var listItem = $(this);
-                storage.removeItem($(this))
-                $("#arvostelu").listview("refresh");
-            })*/
-            
             $("#tyhjenna").click(function() {
                 storage.clear();
                 $("#arvostelu").html("");
             });
-        }
+        }*/
 	     
     </script>
     
