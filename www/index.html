@@ -62,7 +62,6 @@
 		</ul>
 	</div>
 	
-	<!-- Vain dynaamiset header ja footer ominaisuudella data-position="fixed" pysyvät paikallaan vilkkumatta, kun sivua vaihdetaan -->
 	<div data-role="header" data-theme="a" data-position="fixed">
 		<a href="#popupMenu" data-rel="popup" data-transition="flip" id="popupbtn" class="ui-btn ui-btn-inline  ui-corner-all ui-icon-bars ui-btn-icon-notext">Menu</a>
 		<h1></h1>
@@ -81,37 +80,22 @@
 	<div data-role="footer" data-theme="b" data-position="fixed">
 		<h4>Copyright © 2017 by Sami Oksanen, ALL RIGHTS RESERVED</h4>
 	</div>
-	
-	<!-- <div data-role="panel" id="panelMenu" data-display="overlay" data-theme="a"> 
-		<ul data-role="listview">
-			<li><a href="#etusivu" class="ui-btn">Etusivu</a></li>
-			<li><a href="#loyda" class="ui-btn">Löydä</a></li>
-			<li><a href="#arvostele"  class="ui-btn">Arvostele</a></li>
-			<li><a href="#suositukset" class="ui-btn">Suositukset</a></li>
-			<li><a href="#asetukset" class="ui-btn">Asetukset</a></li>
-		</ul>
-	</div> -->
 		 
 	<div data-role="page" id="etusivu" data-title="Etusivu">
 	
 	    <div role="main" class="ui-content ui-body-a">
-            <p>Kuppilat on sovellus, jossa pystyt helposti löytämään parhaat lähimmät kahvilat ja baarit sekä arvostelemaan näitä paikkoja oman ja yhteisen hyvän vuoksi. Enää ei kenenkään tarvitse mennä kalliiseen räkälään viettämään iltaa taikka sitte hakemaan kahvia R-kioskilta.
-            <p>Etusivulla näkee kartan, joka paikantaa kohtaan jossa olet. Lisäksi kartalla näkyy lähellä olevia kahviloita. Kahvilan iconia painaessa tulee esiin pieni popup-ikkuna joka kertoo kahvilan nimen, osoitteen, mahd. nettisivun, sekä käyttäjien antaman yleisarvion kahvilasta. 
-            </p>
             <div id="map"></div>
-	    </div> <!-- /content -->
+	    </div>
 
-    </div> <!-- /page -->
+    </div>
 	
 	<div data-role="page" id="loyda" data-title="Löydä">
   
 	    <div role="main" class="ui-content ui-body-a">
-			 <p>Löydä-sivulla voi hakea kahviloita nimen tai alueen perusteella hakusanoja käyttämällä. Haun päätteeksi tulee lista osumista. Osumaa painaessa saa auki alasivun jossa näkyy kahvilan nimi, osoite, mahd. nettisivu, käyttäjien antama yleisarvio, kartta joka näyttää kahvilan sijainti sekä liuta uusimpia käyttäjien antamia kommentteja.
-             </p>
             <p id="loydaVastaus"></p>
-	    </div> <!-- /content -->
+	    </div>
 		
-    </div> <!-- /page -->
+    </div>
 	
 	<div data-role="page" id="arvostele" data-title="Arvostele">
   
@@ -150,9 +134,9 @@
             </div>
             <ul data-role="listview" id="lista" data-inset="true">
             </ul>
-	    </div> <!-- /content -->
+	    </div>
 
-    </div> <!-- /page -->
+    </div>
 	
 	<div data-role="page" id="arvostelut" data-title="Arvostelut">
   
@@ -163,9 +147,9 @@
 			<p id="arvostelu">
 			</p>
 	
-	    </div> <!-- /content -->
+	    </div>
 
-    </div> <!-- /page -->
+    </div>
 	
 	<div data-role="page" id="asetukset" data-title="Asetukset">
   
@@ -189,9 +173,9 @@
                 <h4 id="tallennusViesti"></h4>
                 <button id="tallenna" class="ui-btn ui-btn-inline ui-corner-all">Tallenna asetukset</button>
 
-	    </div> <!-- /content -->
+	    </div>
 
-    </div> <!-- /page -->
+    </div>
 		
 
     <script type="text/javascript" src="cordova.js"></script>
@@ -227,16 +211,14 @@
             var infowindow;
             if ( navigator.geolocation ) {
                 function success(pos) {
-                    // Location found, show map with these coordinates
                     drawMap(new google.maps.LatLng(pos.coords.latitude, pos.coords.longitude));
                 }
                 function fail(error) {
-                    drawMap(defaultLatLng);  // Failed to find location, show default map
+                    drawMap(defaultLatLng);
                 }
-                // Find the users current position.  Cache the location for 5 minutes, timeout after 6 seconds
                 navigator.geolocation.getCurrentPosition(success, fail, {maximumAge: 500000, enableHighAccuracy:true, timeout: 6000});
             } else {
-                drawMap(defaultLatLng);  // No geolocation support, show default map
+                drawMap(defaultLatLng);
             }
             function drawMap(latlng) {
                 var myOptions = {
@@ -324,7 +306,6 @@
                       ]
                 };
                 map = new google.maps.Map(document.getElementById("map"), myOptions);
-                // Add an overlay to the map of current lat/lng
                 var marker = new google.maps.Marker({
                     position: latlng,
                     map: map,
@@ -369,10 +350,6 @@
         
 		$(document).on("pagecontainershow", function(event, data){
             $(".ui-content").height(getRealContentHeight());
-            /* if(data.toPage[0].id == "etusivu"){
-                initMap();
-                
-            } */
             if(data.toPage[0].id == "loyda"){
                 loydaValmis();
             }
@@ -422,35 +399,6 @@
                 }
             })
             
-            
-            /*var storage = window.localStorage;
-            $("#lisaa").click(function() {
-                if($("#lisaaArvostelu").valid()){
-                    var arvostelu = {paikka :  $("#paikka").val(), paiva : $("#paiva").val(), arvosana :  $("#arvosana").val(), kuva : fileURL, kuvaus : $("#kuvaus").val()};
-                    storage.setItem(arvostelu.paikka, JSON.stringify(arvostelu));
-                    $("#lisaysViesti").html("Lisätty");
-                }
-             });*/
-            
-            /* $("#lisaa").on("tap", function(){
-                var paikka = $("#paikka").val().trim();
-                var paiva = $("#paiva").val().trim();
-                var arvosana = $("#arvosana").val().trim();
-                var kuva = fileURL,
-                var kuvaus = $("#kuvaus").val().trim();
-                
-                if($("#lisaaArvostelu").valid()){
-                    $("#lista").append("<li data-icon='delete'> <a href='#'>" + paikka + "<br>" + paiva + "<br>" + arvosana + "<br>" + kuvaus + "</a></li>");
-                    $("#lista").listview("refresh");
-                    $("#paikka").val("");
-                    $("#arvosana").val("");
-                    $("#kuvaus").val("");
-                }
-            })
-            $(document).on("tap", "#lista li", function(){
-                var listItem = $(this);
-                listItem.remove();
-            }) */
 		})
         
         function tallennaAsetukset(){
@@ -512,14 +460,7 @@
 			return false;
 		})
 	
-
-		/* $(document).on("swiperight", ".ui-page", function(event) {
-			$( "#panelMenu" ).panel( "open" );
-		}) */
-
-		
 		function navi() {
-			// attribuutti data-title
 			var current = $( ".ui-page-active" ).jqmData( "title" );
 			
 			$( "[data-role='header'] h1" ).text( current );
@@ -532,40 +473,6 @@
 				}
 			})
 		}
-        
-       /* function initMap() {
-            var map = new google.maps.Map(document.getElementById('map'), {
-            center: {lat: 60.192059, lng: 24.945831},
-            zoom: 15
-            });
-            var infoWindow = new google.maps.InfoWindow({map: map});
-
-            // Try HTML5 geolocation.
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                var pos = {
-                    lat: position.coords.latitude,
-                    lng: position.coords.longitude
-                };
-
-                infoWindow.setPosition(pos);
-                infoWindow.setContent('Olet täällä!');
-                map.setCenter(pos);
-                }, function() {
-                    handleLocationError(true, infoWindow, map.getCenter());
-                });
-            } else {
-                // Browser doesn't support Geolocation
-                handleLocationError(false, infoWindow, map.getCenter());
-            }
-        }
-
-        function handleLocationError(browserHasGeolocation, infoWindow, pos) {
-            infoWindow.setPosition(pos);
-            infoWindow.setContent(browserHasGeolocation ?
-                              'Error: The Geolocation service failed.' :
-                              'Error: Your browser doesn\'t support geolocation.');
-        } */
         
         function loydaValmis(){
             navigator.geolocation.getCurrentPosition(onLocationSuccess, onLocationError, { timeout: 40000 });
@@ -776,33 +683,6 @@
 				$("#arvosteluViesti").html("Arvosteluja ei pystytty hakemaan");
 			})			
 		}
-      /*  function listaaArvostelut(){
-            var storage = window.localStorage;
-
-            var teksti = "";
-            $("#arvostelu").empty();
-            for (var i = 0; i < storage.length; i++){
-                var arvostelu = storage.getItem(storage.key(i));
-                var item = JSON.parse(arvostelu);
-				teksti += "<p><b>" + item.paikka + "</b>";
-				teksti += "<br>" + item.paiva;
-				teksti += "<br>Arvosana: " + item.arvosana;
-                if(item.kuva != "") {
-						teksti += "<br><img src='data:image/jpeg;base64," + item.kuva + "' alt='Ei kuvaa'>";
-				}
-                if(item.kuvaus != null){
-                    teksti += "<br>" + item.kuvaus;    
-                }
-            }
-
-            $("#arvostelu").html(teksti);
-            
-            $("#tyhjenna").click(function() {
-                storage.clear();
-                $("#arvostelu").html("");
-            });
-        }*/
-	     
     </script>
     
 </body>
